@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Churn Predictor</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="container">
+    <h1>📊 Churn Predictor</h1>
+
+    <form id="form">
+
+        <div class="input-group">
+            <label>Âge</label>
+            <input type="range" id="age" min="18" max="80" value="30">
+            <div class="value">Valeur : <span id="ageVal">30</span></div>
+        </div>
+
+        <div class="input-group">
+            <label>Années client</label>
+            <input type="range" id="years" min="0" max="20" value="5">
+            <div class="value">Valeur : <span id="yearsVal">5</span></div>
+        </div>
+
+        <div class="input-group">
+            <label>Nombre de sites</label>
+            <input type="range" id="num_sites" min="1" max="50" value="10">
+            <div class="value">Valeur : <span id="sitesVal">10</span></div>
+        </div>
+
+        <div class="input-group toggle">
+            <label>Account Manager</label>
+            <input type="checkbox" id="account_manager">
+        </div>
+
+        <button type="submit">Prédire le churn</button>
+
+    </form>
+
+    <div class="loader" id="loader">⏳ Calcul en cours...</div>
+
+    <div id="result" class="result">
+        <h2 id="status"></h2>
+        <p id="prob"></p>
+    </div>
+</div>
+
+<script>
+const age = document.getElementById("age");
+const years = document.getElementById("years");
+const sites = document.getElementById("num_sites");
+
+age.oninput = () => document.getElementById("ageVal").innerText = age.value;
+years.oninput = () => document.getElementById("yearsVal").innerText = years.value;
+sites.oninput = () => document.getElementById("sitesVal").innerText = sites.value;
+
+document.getElementById("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    document.getElementById("loader").style.display = "block";
+    document.getElementById("result").style.display = "none";
+
+    const data = {
+        age: parseInt(age.value),
+        account_manager: document.getElementById("account_manager").checked ? 1 : 0,
+        years: parseInt(years.value),
+        num_sites: parseInt(sites.value)
+    };
+
+    const res = await fetch("/predict", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+
+    document.getElementById("loader").style.display = "none";
+
+    const resultDiv = document.getElementById("result");
+    resultDiv.style.display = "block";
+
+    if (result.churn_prediction === 1) {
+        resultDiv.className = "result bad";
+        document.getElementById("status").innerText = "⚠️ Client à risque";
+    } else {
+        resultDiv.className = "result good";
+        document.getElementById("status").innerText = "✅ Client fidèle";
+    }
+
+    document.getElementById("prob").innerText =
+        "Probabilité : " + (result.churn_probability * 100).toFixed(1) + "%";
+});
+</script>
+
+</body>
+</html>
