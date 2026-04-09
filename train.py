@@ -39,3 +39,5 @@ print("Modèle de régression logistique entrainé et sauvegardé !")
 # print(f"Recall    : {recall_score(y_test, y_pred)}")
 # print(f"Precision : {precision_score(y_test, y_pred)}")
 # print(f"F1-score  : {f1_score(y_test, y_pred)}")
+
+# Petite modification pour relancer le workflow
