@@ -10,6 +10,8 @@ COPY data/churn_model_clean.pkl data/churn_model_clean.pkl
 COPY static/style.css static/style.css
 COPY templates/index.html templates/index.html
 
+COPY tests tests
+
 EXPOSE 5000
 
 CMD ["python", "app.py"]
